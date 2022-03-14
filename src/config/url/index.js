@@ -1,0 +1,1 @@
+export const url = 'http://10.0.2.2/warung-app-ci4-rest/public/api/';

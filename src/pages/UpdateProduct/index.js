@@ -14,10 +14,12 @@ const UpdateProduct = ({route, navigation}) => {
   const [categories, setCategories] = useState([]);
   const [category_id, setCategoryId] = useState([]);
   const [photo, setPhoto] = useState('');
-  const [old_image, setOldImage] = useState('');
-  const [image, setImage] = useState('');
-  const [product_name, setProductName] = useState('')
-  const [price, setPrice] = useState('');
+  const [data, setData] = useState({
+    product_name: '',
+    price: '',
+    image: '',
+    old_image: ''
+  })
 
   const { id } = route.params;
   const evenCategories = categories.filter((e, i) => i % 2 === 0);
@@ -44,9 +46,10 @@ const UpdateProduct = ({route, navigation}) => {
             setCategories(resCategories)
             // singleProduct
             setCategoryId(tempCategoryId)
-            setProductName(resSingleProduct.product_name)
-            setPrice(resSingleProduct.price)
-            setOldImage(resSingleProduct.image)
+            setData(prev => ({...prev, product_name: resSingleProduct.product_name}))
+            setData(prev => ({...prev, price: resSingleProduct.price}))
+            setData(prev => ({...prev, image: resSingleProduct.image}))
+            setData(prev => ({...prev, old_image: resSingleProduct.image}))
             setPhoto(resSingleProduct.image)
             dispatch({type: 'SET_LOADING', value: false});
           })
@@ -70,27 +73,24 @@ const UpdateProduct = ({route, navigation}) => {
         const source = response.assets[0].uri
         const imageString = `data:image/jpeg;base64,${response.assets[0].base64}`
         setPhoto(source)
-        setImage(imageString)
+        setData({...data, image: imageString})
       }
     })
   }
 
 
   const submit = () => {
-    const data = {
-      product_name,
-      price,
-      category_id,
-      image : image === '' ? old_image : image,
-      old_image
+    const newData = {
+      ...data,
+      category_id
     };
     
-    if (data.image === old_image) {
-      delete data.old_image
+    if (newData.image === data.old_image) {
+      delete newData.old_image
     }
 
     dispatch({type: 'SET_LOADING', value: true})
-    axios.put(url + `products/${id}`, qs.stringify(data), {
+    axios.put(url + `products/${id}`, qs.stringify(newData), {
       headers: {
         'Authorization' : token
       }
@@ -125,9 +125,9 @@ const UpdateProduct = ({route, navigation}) => {
         <FormHeader title="Ubah Produk" />
         <Gap height={24} />
         <View style={styles.wrapper}>
-          <TextInput label="Nama Produk" value={product_name} placeholder="Masukan nama produk"  onChangeText={(value) => setProductName(value)} />
+          <TextInput label="Nama Produk" value={data.product_name} placeholder="Masukan nama produk"  onChangeText={(value) => setData({...data, product_name: value})} />
           <Gap height={20} />
-          <TextInput label="Harga" value={price} placeholder="Masukan harga produk" onChangeText={(value) => setPrice(value)} />
+          <TextInput label="Harga" value={data.price} placeholder="Masukan harga produk" onChangeText={(value) => setData({...data, price: value})} />
           <Gap height={20} />
           <View>
             <Text style={styles.label}>Kategori</Text>

@@ -7,20 +7,21 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useDispatch } from 'react-redux';
 import { CheckBoxInput, FormHeader, Gap, SubmitButton, TextInput } from '../../components';
 import { token, url } from '../../config';
-import { showMessage, useForm } from '../../utils';
+import { showMessage } from '../../utils';
 import qs from 'qs';
 
 const AddProduct = () => {
+  const initialState = {
+    product_name: '',
+    price: '',
+    image: ''
+  }
   const [resetBox, doResetBox] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
-  const [categoryId, setCategoryId] = useState([]);
+  const [category_id, setCategoryId] = useState([]);
   const [categories, setCategories] = useState([]);
   const [photo, setPhoto] = useState('');
-  const [image, setImage] = useState('');
-  const [form, setForm] = useForm({
-    product_name : '',
-    price : '',
-  })
+  const [data, setData] = useState(initialState)
 
   const evenCategories = categories.filter((e, i) => i % 2 === 0);
   const oddCategorries = categories.filter((e, i) => i % 2 !== 0);
@@ -30,10 +31,9 @@ const AddProduct = () => {
     if (action === 'set') {
       setCategoryId(arr => [...arr, id]);
     } else {
-      setCategoryId(categoryId.filter(arr => arr !== id))
+      setCategoryId(category_id.filter(arr => arr !== id))
     }
   }
-  
   
   useFocusEffect(
     useCallback(() => {
@@ -79,35 +79,31 @@ const AddProduct = () => {
         const source = { uri: response.assets[0].uri }
         const imageString = `data:image/jpeg;base64,${response.assets[0].base64}`
         setPhoto(source)
-        setImage(imageString)
+        setData({...data, image: imageString})
       }
     })
   }
 
   const onSubmit = () => {
-    const data = {
-      ...form,
-      category_id: [
-        ...categoryId
-      ],
-      image
+    const newData = {
+      ...data,
+      category_id
     }
     
-    if (image === '') {
-      delete data.image;
+    if (data.image === '') {
+      delete newData.image;
     }
 
     dispatch({type: 'SET_LOADING', value: true})
-    axios.post(url + 'products', qs.stringify(data), {
+    axios.post(url + 'products', qs.stringify(newData), {
       headers : {
         'Authorization' : token
       }
     })
     .then(res => {
-      setForm('reset');
       setCategoryId([]);
-      setImage('');
-      setPhoto('');
+      setData({...initialState})
+      setPhoto('')
       doResetBox(prev => prev + 1);
       dispatch({type: 'SET_LOADING', value: false})
       showMessage(res.data.data.message, 'success')
@@ -140,9 +136,9 @@ const AddProduct = () => {
         <FormHeader title="Tambah Produk" />
         <Gap height={24} />
         <View style={styles.wrapper}>
-          <TextInput label="Nama Produk" placeholder="Masukan nama produk" value={form.product_name} onChangeText={(value) => setForm('product_name', value) } />
+          <TextInput label="Nama Produk" placeholder="Masukan nama produk" value={data.product_name} onChangeText={(value) => setData({...data, product_name: value}) } />
           <Gap height={20} />
-          <TextInput label="Harga" placeholder="Masukan harga produk" value={form.price} onChangeText={(value) => setForm('price', value) } />
+          <TextInput label="Harga" placeholder="Masukan harga produk" value={data.price} onChangeText={(value) => setData({...data, price: value}) } />
           <Gap height={20} />
           <View>
             <Text style={styles.label}>Kategori</Text>

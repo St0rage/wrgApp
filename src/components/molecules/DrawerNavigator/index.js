@@ -2,15 +2,20 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { DrawerContentScrollView } from '@react-navigation/drawer'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import { IcArrowDown, IcArrowUp, IcBasketWhite, IcTriangle } from '../../../assets';
+import { IcArrowDown, IcArrowUp, IcBasketWhite, IcFireWhite, IcTriangle } from '../../../assets';
 import Collapsible from 'react-native-collapsible';
+import { Gap } from '../../atoms';
 
 const DrawerNavigator = ({navigation}) => {
-    const [collapseToggle, setCollapseToggle] = useState(false);
+    const [collapseToggle, setCollapseToggle] = useState({
+        'products': false,
+        'gas': false
+    });
 
     return (
         <DrawerContentScrollView style={styles.container}>
-            <TouchableOpacity onPress={() => setCollapseToggle(collapseToggle ? false : true)} style={styles.section}>
+            {/* PRODCTS SECTION */}
+            <TouchableOpacity onPress={() => setCollapseToggle({...collapseToggle, products: collapseToggle.products ? false: true})} style={styles.section}>
                 <IcBasketWhite />
                 <Text style={styles.sectionTitle} >Produk</Text>
                 {
@@ -21,7 +26,7 @@ const DrawerNavigator = ({navigation}) => {
                     )
                 }
             </TouchableOpacity>
-            <Collapsible collapsed={collapseToggle} style={styles.collapseContent}>
+            <Collapsible collapsed={collapseToggle.products} style={styles.collapseContent}>
                 <TouchableOpacity onPress={() => navigation.navigate('AddProduct')} style={styles.collapseItem}>
                     <IcTriangle />
                     <Text style={styles.collapseLabel}>Tambah Produk</Text>
@@ -39,6 +44,25 @@ const DrawerNavigator = ({navigation}) => {
                     <Text style={styles.collapseLabel}>Hapus Kategori</Text>
                 </TouchableOpacity>
             </Collapsible>
+            {/* GAS SECTION */}
+            <Gap height={20} />
+            <TouchableOpacity onPress={() => setCollapseToggle({...collapseToggle, gas: collapseToggle.gas ? false : true})} style={styles.section}>
+                <IcFireWhite />
+                <Text style={styles.sectionTitle} >Gas</Text>
+                {
+                    collapseToggle ? (
+                        <IcArrowDown style={styles.sectionArrow} />
+                    ) : (
+                        <IcArrowUp style={styles.sectionArrow} />
+                    )
+                }
+            </TouchableOpacity>
+            <Collapsible collapsed={collapseToggle.gas} style={styles.collapseContent}>
+                <TouchableOpacity onPress={() => navigation.navigate('ManageStackGas')} style={styles.collapseItem}>
+                    <IcTriangle />
+                    <Text style={styles.collapseLabel}>Daftar Gas</Text>
+                </TouchableOpacity>
+            </Collapsible>
         </DrawerContentScrollView>
     )
 }
@@ -53,7 +77,7 @@ const styles = StyleSheet.create({
     },
     section: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     sectionTitle: {
         fontSize: 20,

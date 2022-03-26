@@ -1,16 +1,34 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import React from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { Keyboard } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { BottomNavigator, DrawerNavigator } from '../components';
-import { AddCategory, AddProduct, DeleteCategory, HomeGas, HomeNota, HomeProduct, ManageProduct, UpdateProduct } from '../pages';
+import { AddCategory, AddGasNote, AddProduct, DeleteCategory, GasList, HomeGas, HomeNota, HomeProduct, ManageProduct, UpdateGasNote, UpdateGasPrice, UpdateProduct } from '../pages';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 const Router = () => {
+
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        const keyboardDidShow = Keyboard.addListener("keyboardDidShow", () => {
+            dispatch({type: 'SET_KEYBOARD', value: true})
+        });
+        const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
+            dispatch({type: 'SET_KEYBOARD', value: false})
+        })
+      
+        return () => {
+            keyboardDidShow.remove();
+            keyboardDidHide.remove();
+        }
+    }, [])
+
     return (
         <Drawer.Navigator useLegacyImplementation={false} drawerContent={(props) => <DrawerNavigator {...props} />}>
             <Drawer.Screen name="Home" component={Home} options={{ headerShown: false }} />
@@ -18,6 +36,8 @@ const Router = () => {
             <Drawer.Screen name="ManageStack" component={ManageStack} options={{ headerShown: false }} />
             <Drawer.Screen name="AddCategory" component={AddCategory} options={{ headerShown: false }} />
             <Drawer.Screen name="DeleteCategory" component={DeleteCategory} options={{ headerShown: false }} />
+            <Drawer.Screen name="ManageStackGas" component={ManageStackGas} options={{ headerShown: false }} />
+            <Drawer.Screen name="AddGasNote" component={AddGasNote} options={{ headerShown: false }} />
         </Drawer.Navigator>
     )
 }
@@ -61,6 +81,23 @@ const ManageStack = () => {
     )
 }
 
+const ManageStackGas = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen 
+                name='GasList'
+                component={GasList}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen 
+                name='UpdateGasPrice'
+                component={UpdateGasPrice}
+                options={{ headerShown: false }}
+            />
+        </Stack.Navigator>
+    )
+}
+
 const Home = () => {
   return (
     <Stack.Navigator>
@@ -69,28 +106,14 @@ const Home = () => {
             component={MainApp}
             options={{ headerShown: false }}
         />
+        <Stack.Screen 
+            name="UpdateGasNote"
+            component={UpdateGasNote}
+            options={{ headerShown: false }}
+        />
 
     </Stack.Navigator>
   )
 }
 
 export default Router
-
-const style = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        backgroundColor: '#0E3BEF',
-        justifyContent: 'space-around',
-        height: 60
-    },
-    content: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        
-    },
-    label: {
-        fontSize: 12,
-        fontWeight: '500',
-        marginTop: 5
-    }
-})

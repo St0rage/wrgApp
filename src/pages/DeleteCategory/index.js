@@ -6,14 +6,12 @@ import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native
 import { useDispatch } from 'react-redux';
 import { FormHeader, Gap, SubmitButton } from '../../components';
 import { token, url } from '../../config';
-import { showMessage, useForm } from '../../utils';
+import { showMessage } from '../../utils';
 
 const DeleteCategory = () => {
   const [categories, setCategories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [form, setForm] = useForm({
-    category_id : 0
-  })
+  const [category_id, setCategoryId] = useState(0)
 
   const dispatch = useDispatch();
 
@@ -38,8 +36,7 @@ const DeleteCategory = () => {
 
   const onSubmit = () => {
     dispatch({type: 'SET_LOADING', value: true})
-    console.log('form before : ', form)
-    axios.delete( url + `categories/${form.category_id}`, {
+    axios.delete( url + `categories/${category_id}`, {
       headers: {
         'Authorization': token
       }
@@ -50,10 +47,16 @@ const DeleteCategory = () => {
         showMessage(res.data.data.message, 'success');
       })
       .catch(err => {
-        dispatch({type: 'SET_LOADING', value: false})
-        showMessage(err.response.data.data.message, 'danger');
+        const error = err.response;
+        if (error === undefined) {
+          dispatch({type: 'SET_LOADING', value: false})
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
+        } else {
+          dispatch({type: 'SET_LOADING', value: false})
+          showMessage(err.response.data.data.message, 'danger');
+        }
       })
-    setForm('category_id', 0)
+    setCategoryId(0)
   }
 
   const successDelete = () => {
@@ -64,9 +67,6 @@ const DeleteCategory = () => {
     })
     .then(res => {
       setCategories(res.data.data)
-    })
-    .catch(err => {
-
     })
   }
 
@@ -96,7 +96,7 @@ const DeleteCategory = () => {
         <View style={styles.wrapper}>
           <Text style={styles.label}>Kategori</Text>
           <View style={styles.picker}>
-            <Picker selectedValue={form.category_id} onValueChange={(itemValue) => setForm('category_id', itemValue) } >
+            <Picker selectedValue={category_id} onValueChange={(itemValue) => setCategoryId(itemValue) } >
               <Picker.Item label="Pilih Kategori" value="pilih kategori" />
               {
                 categories.map((e, i) => (

@@ -13,5 +13,5 @@ export {
     TextInput,
     CheckBoxInput,
     CheckBoxInputSet,
-    SubmitButton
+    SubmitButton,
 }

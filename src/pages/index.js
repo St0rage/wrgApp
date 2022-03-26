@@ -6,6 +6,10 @@ import ManageProduct from "./ManageProduct";
 import AddCategory from "./AddCategory";
 import DeleteCategory from "./DeleteCategory";
 import UpdateProduct from "./UpdateProduct";
+import GasList from "./GasList";
+import AddGasNote from "./AddGasNote";
+import UpdateGasNote from "./UpdateGasNote";
+import UpdateGasPrice from "./UpdateGasPrice";
 
 export {
     HomeProduct,
@@ -16,4 +20,8 @@ export {
     AddCategory,
     DeleteCategory,
     UpdateProduct,
+    GasList,
+    AddGasNote,
+    UpdateGasNote,
+    UpdateGasPrice
 }

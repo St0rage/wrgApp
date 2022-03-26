@@ -2,9 +2,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import qs from 'qs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, Keyboard, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Modal from 'react-native-modalbox';
 import { useDispatch } from 'react-redux';
 import { CategoryButton, Gap, Header, ProductItem, Search } from '../../components';
 import { token, url } from '../../config';
@@ -14,28 +13,12 @@ const HomeProduct = ({navigation}) => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [totalProduct, setTotalProduct] = useState(0);
-  const [image, setImage] = useState('');
   const [activeLabel, setActiveLabel] = useState('Semua');
   const [curCategoryId, setCurCategoryId] = useState('');
   const [search, setSearch] = useState('');
   
   const dispatch = useDispatch();
-  const viewImage = useRef();
   const scroll = useRef()
-
-  useEffect(() => {
-    const keyboardDidShow = Keyboard.addListener("keyboardDidShow", () => {
-      dispatch({type: 'SET_KEYBOARD', value: true})
-    });
-    const keyboardDidHide = Keyboard.addListener("keyboardDidHide", () => {
-      dispatch({type: 'SET_KEYBOARD', value: false})
-    })
-
-    return () => {
-      keyboardDidShow.remove();
-      keyboardDidHide.remove();
-    }
-  }, [])
 
   useFocusEffect(
     useCallback(() => {
@@ -125,8 +108,8 @@ const HomeProduct = ({navigation}) => {
   }
 
   const openImage = (uri) => {
-    setImage(uri)
-    viewImage.current.open()
+    dispatch({type: 'SET_IMAGE_URI', value: uri})
+    dispatch({type: 'SET_IMAGE_MODAL', value: true})
   }
 
   const liveSearch = (value) => {
@@ -166,7 +149,7 @@ const HomeProduct = ({navigation}) => {
       <View style={styles.wrapper}> 
         <Header onPress={() => navigation.toggleDrawer()} />
         <Gap height={24} />
-        <Search value={search} onChangeText={liveSearch} />
+        <Search placeholder="Cari Barang" value={search} onChangeText={liveSearch} />
       </View>
       <Gap height={16} />
       <View>
@@ -220,10 +203,6 @@ const HomeProduct = ({navigation}) => {
           }
         </View>
       </ScrollView>
-
-      <Modal position={'center'} entry={'top'} animationDuration={100} ref={viewImage} style={{ height: 400, width: 400 }}>
-        <Image source={{ uri : image }} style={{ height: 400, width: 400 }} />
-      </Modal>
     </View>
   )
 }

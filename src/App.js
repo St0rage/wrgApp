@@ -1,12 +1,13 @@
 import { NavigationContainer } from '@react-navigation/native';
 import React from 'react';
-import Router from './router';
 import { LogBox } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import FlashMessage from 'react-native-flash-message';
-import {Provider, useSelector} from 'react-redux';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Provider, useSelector } from 'react-redux';
+import { GasNoteDetail, GasNoteDetailSet, Loading } from './components';
+import ProductImage from './components/molecules/ProductImage';
 import store from './redux/store';
-import { Loading } from './components';
+import Router from './router';
 
 LogBox.ignoreLogs([
   "[react-native-gesture-handler] Seems like you're using an old API with gesture components, check out new Gestures system!",
@@ -14,6 +15,7 @@ LogBox.ignoreLogs([
 ]);
 
 const MainApp = () => {
+  
   const { isLoading } = useSelector((state) => state.globalReducer)
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -21,6 +23,9 @@ const MainApp = () => {
           <Router />
           <FlashMessage position="top" />
           {isLoading && <Loading />}
+          <GasNoteDetail />
+          <GasNoteDetailSet />
+          <ProductImage />
       </NavigationContainer>
     </GestureHandlerRootView>
   )

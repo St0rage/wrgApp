@@ -1,28 +1,28 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import { FormHeader, Gap, SubmitButton, TextInput } from '../../components';
-import { useForm, showMessage } from '../../utils';
-import { token, url } from '../../config';
 import axios from 'axios';
 import qs from 'qs';
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { FormHeader, Gap, SubmitButton, TextInput } from '../../components';
+import { token, url } from '../../config';
+import { showMessage } from '../../utils';
 
 const AddCategory = () => {
-  const [form, setForm] = useForm({
+  const [data, setData] = useState({
     category_name: ''
-  });
+  })
 
   const dispatch = useDispatch();
 
   const onSubmit = () => {
     dispatch({type: 'SET_LOADING', value: true})
-    axios.post( url + 'categories', qs.stringify(form), {
+    axios.post( url + 'categories', qs.stringify(data), {
       headers: {
         'Authorization' : token
       }
     })
       .then(res => {
-        setForm('category_name', '')
+        setData({...data, category_name: ''})
         dispatch({type: 'SET_LOADING', value: false})
         showMessage(res.data.data.message, 'success')
       })
@@ -40,7 +40,7 @@ const AddCategory = () => {
       <FormHeader title="Tambah Kategori" />
       <Gap height={24} />
       <View style={styles.wrapper}>
-        <TextInput label="Nama Kategori" placeholder="Masukan nama kategori" value={form.category_name} onChangeText={(value) => setForm('category_name', value)} />
+        <TextInput label="Nama Kategori" placeholder="Masukan nama kategori" value={data.category_name} onChangeText={(value) => setData({...data, category_name: value})} />
         <Gap height={44} />
         <SubmitButton label="Tambahkan Kategori" onPress={onSubmit} />
       </View>

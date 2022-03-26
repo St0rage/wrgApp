@@ -7,7 +7,10 @@ import IcNoteWhite from './ic-note-white.svg';
 import IcArrowUp from './ic-arrow-up.svg';
 import IcArrowDown from './ic-arrow-down.svg';
 import IcTriangle from './ic-triangle.svg';
-import IcBurgerMenu from './ic-burger-menu';
+import IcBurgerMenu from './ic-burger-menu.svg';
+import IcCreate from './ic-create.svg';
+import IcCounterMinus from './ic-counter-minus.svg';
+import IcCounterPlus from './ic-counter-plus.svg';
 
 export {
     IcBasket,
@@ -19,5 +22,8 @@ export {
     IcArrowDown,
     IcArrowUp,
     IcTriangle,
-    IcBurgerMenu
+    IcBurgerMenu,
+    IcCreate,
+    IcCounterMinus,
+    IcCounterPlus
 }

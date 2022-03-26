@@ -3,10 +3,9 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MiniCategory from '../../atoms/MiniCategory';
 import { useNavigation } from '@react-navigation/native';
+import { currencyFormat } from '../../../utils';
 
 const ProductItem = ({type = 'default', image, title, desc, categories, func, id, alert}) => {
-
-  const price = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumSignificantDigits: 3 }).format(desc);
 
   const navigation = useNavigation();
 
@@ -27,7 +26,7 @@ const ProductItem = ({type = 'default', image, title, desc, categories, func, id
         <View style={styles.content}>
             <View>
               <Text style={styles.title}>{title}</Text>
-              <Text style={styles.price}>{price}</Text>
+              <Text style={styles.price}>{currencyFormat(desc)}</Text>
             </View>
             <View style={styles.category(type)}>
               <View style={styles.categoryWrapper}>
@@ -51,7 +50,7 @@ const ProductItem = ({type = 'default', image, title, desc, categories, func, id
         <View style={styles.content}>
             <View>
               <Text style={styles.title}>{title}</Text>
-              <Text style={styles.price}>{price}</Text>
+              <Text style={styles.price}>{currencyFormat(desc)}</Text>
             </View>
             <View style={styles.category(type)}>
               <View style={styles.categoryWrapper}>

@@ -1,22 +1,20 @@
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import qs from 'qs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Modal from 'react-native-modalbox';
+import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { CategoryButton, Gap, Header, ProductItem, Search } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
-import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
-import qs from 'qs'
 
 
 const ManageProduct = ({navigation}) => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [totalProduct, setTotalProduct] = useState(0);
-  const [image, setImage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [currentId, setCurrentId] = useState('');
@@ -64,7 +62,6 @@ const ManageProduct = ({navigation}) => {
   }, [showSuccess])
 
   const dispatch = useDispatch();
-  const viewImage = useRef();
   const scroll = useRef(); 
 
   useFocusEffect(
@@ -148,8 +145,8 @@ const ManageProduct = ({navigation}) => {
   }, [curCategoryId])
 
   const openImage = (uri) => {
-    setImage(uri)
-    viewImage.current.open()
+    dispatch({type: 'SET_IMAGE_URI', value: uri})
+    dispatch({type: 'SET_IMAGE_MODAL', value: true})
   }
 
   const openAlert = (id) => {
@@ -228,7 +225,7 @@ const ManageProduct = ({navigation}) => {
       <View style={styles.wrapper}> 
         <Header onPress={() => navigation.toggleDrawer()} />
         <Gap height={24} />
-        <Search value={search} onChangeText={liveSearch} />
+        <Search placeholder="Cari Barang" value={search} onChangeText={liveSearch} />
       </View>
       <Gap height={16} />
       <View>
@@ -281,20 +278,16 @@ const ManageProduct = ({navigation}) => {
         </View>
       </ScrollView>
 
-      <Modal position={'center'} entry={'top'} animationDuration={100} ref={viewImage} style={{ height: 400, width: 400 }}>
-        <Image source={{ uri : image }} style={{ height: 400, width: 400 }} />
-      </Modal>
-
       <SCLAlert 
         theme="warning"
         show={showAlert}
         title="Peringatan!!"
         subtitle="Tekan Tombol Hapus Untuk Menghapus Produk Ini" 
         onRequestClose={() => {}}
-        useNativeDriver={false}
+        useNativeDriver={true}
       >
-        <SCLAlertButton theme="info" onPress={() => closeAlert()} >Batal</SCLAlertButton>
-        <SCLAlertButton theme="danger" onPress={() => deleteProduct()} >Hapus</SCLAlertButton>
+        <SCLAlertButton theme="info" onPress={closeAlert} >Batal</SCLAlertButton>
+        <SCLAlertButton theme="danger" onPress={deleteProduct} >Hapus</SCLAlertButton>
       </SCLAlert>
 
       <SCLAlert 
@@ -305,7 +298,7 @@ const ManageProduct = ({navigation}) => {
         onRequestClose={() => {}}
         useNativeDriver={false}
       >
-        <SCLAlertButton theme="success" onPress={() => closeSuccess()} >Selesai</SCLAlertButton>
+        <SCLAlertButton theme="success" onPress={closeSuccess} >Selesai</SCLAlertButton>
       </SCLAlert>
 
     </View>

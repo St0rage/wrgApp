@@ -93,7 +93,7 @@ const FirstRoute = () => {
                   notes.map((e, i) => (
                     <GasNoteItem 
                       id={e.id} 
-                      name={e.name} 
+                      name={e.costumer_name} 
                       desc={e.gas_name} 
                       qty={e.quantity} 
                       created_at={e.created_at} 
@@ -188,7 +188,7 @@ const SecondRoute = () => {
                 notes.map((e, i) => (
                   <GasNoteItem 
                     id={e.id} 
-                    name={e.name} 
+                    name={e.costumer_name} 
                     desc={e.gas_name} 
                     qty={e.quantity} 
                     taken_at={e.taken_at}

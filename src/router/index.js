@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import { Keyboard } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { BottomNavigator, DrawerNavigator } from '../components';
-import { AddCategory, AddGasNote, AddProduct, DeleteCategory, GasList, HomeGas, HomeNota, HomeProduct, ManageProduct, UpdateGasNote, UpdateGasPrice, UpdateProduct } from '../pages';
+import { AddCategory, AddCostumers, AddGasNote, AddProduct, Costumers, DeleteCategory, GasList, HomeGas, HomeNota, HomeProduct, ManageProduct, UpdateGasNote, UpdateGasPrice, UpdateProduct } from '../pages';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,6 +37,7 @@ const Router = () => {
             <Drawer.Screen name="AddCategory" component={AddCategory} options={{ headerShown: false }} />
             <Drawer.Screen name="DeleteCategory" component={DeleteCategory} options={{ headerShown: false }} />
             <Drawer.Screen name="ManageStackGas" component={ManageStackGas} options={{ headerShown: false }} />
+            <Drawer.Screen name="ManageCostumers" component={ManageCostumers} options={{ headerShown: false }} />
             <Drawer.Screen name="AddGasNote" component={AddGasNote} options={{ headerShown: false }} />
         </Drawer.Navigator>
     )
@@ -92,6 +93,23 @@ const ManageStackGas = () => {
             <Stack.Screen 
                 name='UpdateGasPrice'
                 component={UpdateGasPrice}
+                options={{ headerShown: false }}
+            />
+        </Stack.Navigator>
+    )
+}
+
+const ManageCostumers = () => {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen 
+                name='Costumers'
+                component={Costumers}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen 
+                name='AddCostumers'
+                component={AddCostumers}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>

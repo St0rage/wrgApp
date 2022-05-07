@@ -7,7 +7,7 @@ import FormHeader from "./FormHeader";
 import Loading from "./Loading";
 import HomeGasTabSection from "./HomeGasTabSection";
 import GasNoteItem from "./GasNoteItem";
-import GasItem from "./GasItem";
+import List from "./List";
 import GasNoteDetail from "./GasNoteDetail";
 import GasNoteDetailSet from "./GasNoteDetailSet";
 
@@ -21,7 +21,7 @@ export {
     Loading,
     HomeGasTabSection,
     GasNoteItem,
-    GasItem,
+    List,
     GasNoteDetail,
     GasNoteDetailSet
 }

@@ -13,31 +13,40 @@ import qs from 'qs'
 
 const AddGasNote = () => {
     const initialState = {
-        name: '',
+        costumer_id: '',
         gas_id: '',
         quantity : 0
     }
     const [data, setData] = useState(initialState)
     const [gasList, setGasList] = useState([])
+    const [costumers, setCostumers] = useState([])
 
     const dispatch = useDispatch()
 
     useFocusEffect(
         useCallback(() => {
+            setData({...initialState})
             dispatch({type: 'SET_LOADING', value: true})
-            axios.get(url + 'gas', {
-                headers: {
-                    'Authorization' : token
-                }
-            })
-            .then(res => {
-                setGasList(res.data.data);
+            const getGasList = axios.get(url + 'gas', {headers: {'Authorization' : token}});
+            const getCostumers = axios.get(url + 'gas/costumers', {headers: {'Authorization' : token}});
+            axios
+            .all([getGasList, getCostumers])
+            .then(
+                axios.spread((...responses) => {
+                const resGasList = responses[0];
+                const resCostumers = responses[1];
+
+                setGasList(resGasList.data.data);
+                setCostumers(resCostumers.data.data);
+                console.log(resCostumers.data.data);
+
                 dispatch({type: 'SET_LOADING', value: false})
-            })
-            .catch(err => {
+                })
+            )
+            .catch(errors => {
                 dispatch({type: 'SET_LOADING', value: false})
-                showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
-            })
+                showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+            }) 
         }, [])
     )
 
@@ -80,7 +89,16 @@ const AddGasNote = () => {
         <FormHeader title="Tambah Catatan" />
         <Gap height={24} />
         <View style={styles.wrapper}>
-            <TextInput label="Nama" placeholder="Masukan nama penitip" value={data.name} onChangeText={(value) => setData({...data, name: value})} />
+            <View style={styles.picker}>
+                <Picker selectedValue={data.costumer_id} onValueChange={(itemValue) => setData({...data, costumer_id: itemValue})} >
+                    <Picker.Item label="Pilih Nama" value={false} />
+                    {
+                        costumers.map((e,i) => (
+                            <Picker.Item label={e.name} value={e.id} key={i} />
+                        ))
+                    }
+                </Picker>
+            </View>
             <Gap height={20} />
             <Text style={styles.label}>Jenis</Text>
             <View style={styles.picker}>

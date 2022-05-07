@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { FormHeader, Gap, GasItem } from '../../components';
+import { FormHeader, Gap, List } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
 
@@ -53,7 +53,7 @@ const GasList = () => {
                     <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Daftar Gas Kosong</Text>
                 ) : (
                     gas.map((e, i) => (
-                        <GasItem name={e.name} price={e.price} key={i} id={e.id} />
+                        <List name={e.name} price={e.price} key={i} id={e.id} />
                     ))
                 )
             }

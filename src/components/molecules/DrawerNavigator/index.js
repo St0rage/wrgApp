@@ -62,6 +62,10 @@ const DrawerNavigator = ({navigation}) => {
                     <IcTriangle />
                     <Text style={styles.collapseLabel}>Daftar Gas</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('ManageCostumers')} style={styles.collapseItem}>
+                    <IcTriangle />
+                    <Text style={styles.collapseLabel}>Daftar Pelanggan</Text>
+                </TouchableOpacity>
             </Collapsible>
         </DrawerContentScrollView>
     )

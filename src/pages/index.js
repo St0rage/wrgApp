@@ -10,6 +10,8 @@ import GasList from "./GasList";
 import AddGasNote from "./AddGasNote";
 import UpdateGasNote from "./UpdateGasNote";
 import UpdateGasPrice from "./UpdateGasPrice";
+import Costumers from "./Costumers";
+import AddCostumers from "./AddCostumers";
 
 export {
     HomeProduct,
@@ -23,5 +25,7 @@ export {
     GasList,
     AddGasNote,
     UpdateGasNote,
-    UpdateGasPrice
+    UpdateGasPrice,
+    Costumers,
+    AddCostumers
 }

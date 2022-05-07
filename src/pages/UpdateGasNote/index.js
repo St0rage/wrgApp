@@ -18,7 +18,7 @@ const UpdateGasNote = ({route, navigation}) => {
         gas_price: '',
     }) 
     const [data, setData] = useState({
-        name: '',
+        costumer_name: '',
         quantity: 0,
         gas_id: 0
     })
@@ -40,7 +40,7 @@ const UpdateGasNote = ({route, navigation}) => {
             })
             .then(res => {
                 const response = res.data.data[0]
-                setData(prev => ({...prev, name: response.name}))
+                setData(prev => ({...prev, costumer_name: response.costumer_name}))
                 setData(prev => ({...prev, quantity: parseInt(response.quantity)}))
                 setData(prev => ({...prev, gas_id: response.gas_id}))
                 setGasDetail(prev => ({...prev, gas_name: response.gas_name}))
@@ -52,7 +52,7 @@ const UpdateGasNote = ({route, navigation}) => {
 
     const submit = () => {
         const newData = {...data}
-        delete newData.name;
+        delete newData.costumer_name;
 
         dispatch({type: 'SET_LOADING', value: true})
         axios.put(url + `gas/note/${id}`, qs.stringify(newData), {
@@ -95,7 +95,7 @@ const UpdateGasNote = ({route, navigation}) => {
         <FormHeader title="Ubah Catatan" />
         <Gap height={24} />
         <View style={styles.wrapper}>
-            <TextInput label="Nama" value={data.name} editable={false} />
+            <TextInput label="Nama" value={data.costumer_name} editable={false} />
             <Gap height={20} />
             <Text style={styles.label}>Jenis</Text>
             <View style={styles.picker}>

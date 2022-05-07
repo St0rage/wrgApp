@@ -63,7 +63,7 @@ const GasNoteDetail = () => {
             <View>
                 <Text style={styles.label}>Penitip</Text>
                 <Gap height={8} />
-                <Text style={styles.costumer}>{detail.name}</Text>
+                <Text style={styles.costumer}>{detail.costumer_name}</Text>
                 <Gap height={6} />
                 <Text style={styles.id}>#{detail.id}</Text>
                 <Gap height={10} />

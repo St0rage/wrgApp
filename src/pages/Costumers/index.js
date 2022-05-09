@@ -10,8 +10,30 @@ import { showMessage } from '../../utils'
 
 const Costumers = ({navigation}) => {
   const [costumers, setCostumers] = useState([]);
+  const [refresh, setRefresh] = useState(0)
 
   const dispatch = useDispatch()
+
+  const refreshCostumers = () => {
+    setRefresh(refresh + 1);
+  }
+
+  useEffect(() => {
+    dispatch({type: 'SET_LOADING', value: true})
+      axios.get(url + 'gas/costumers', {
+        headers: {
+          'Authorization' : token
+        }
+      })
+      .then(res => {
+        setCostumers(res.data.data)
+        dispatch({type: 'SET_LOADING', value: false})
+      })
+      .catch(err => {
+        dispatch({type: 'SET_LOADING', value: false})
+        showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+      })
+  }, [refresh])
 
   useFocusEffect(
     useCallback(() => {
@@ -50,7 +72,7 @@ const Costumers = ({navigation}) => {
             <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Daftar Pelanggan Masih Kosong</Text>
           ) : (
             costumers.map((e, i) => (
-              <List name={e.name} key={i} id={e.id} />
+              <List name={e.name} key={i} id={e.id} func={refreshCostumers} />
             ))
           )
         }

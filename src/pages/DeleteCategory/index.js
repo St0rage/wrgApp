@@ -1,8 +1,9 @@
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
 import { useDispatch } from 'react-redux';
 import { FormHeader, Gap, SubmitButton } from '../../components';
 import { token, url } from '../../config';
@@ -11,9 +12,36 @@ import { showMessage } from '../../utils';
 const DeleteCategory = () => {
   const [categories, setCategories] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [refresh, setRefresh] = useState(0);
+  const [showAlert, setShowAlert] = useState(false)
   const [category_id, setCategoryId] = useState(0)
 
   const dispatch = useDispatch();
+
+  const openAlert = () => {
+    setShowAlert(true);
+  }
+
+  const closeAlert = () => {
+    setShowAlert(false);
+  }
+
+  useEffect(() => {
+    dispatch({type: 'SET_LOADING', value: true})
+      axios.get(url + 'categories', {
+        headers: {
+          'Authorization': token
+        }
+      })
+      .then(res => {
+        setCategories(res.data.data);
+        dispatch({type: 'SET_LOADING', value: false});
+      })
+      .catch(err => {
+        dispatch({type: 'SET_LOADING', value: false});
+        showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
+      })
+  }, [refresh])
 
   useFocusEffect(
     useCallback(() => {
@@ -42,11 +70,13 @@ const DeleteCategory = () => {
       }
     })
       .then(res => {
-        successDelete();
+        setShowAlert(false)
         dispatch({type: 'SET_LOADING', value: false});
         showMessage(res.data.data.message, 'success');
+        setRefresh(refresh + 1);
       })
       .catch(err => {
+        setShowAlert(false)
         const error = err.response;
         if (error === undefined) {
           dispatch({type: 'SET_LOADING', value: false})
@@ -57,17 +87,6 @@ const DeleteCategory = () => {
         }
       })
     setCategoryId(0)
-  }
-
-  const successDelete = () => {
-    axios.get( url + 'categories', {
-      headers: {
-        'Authorization': token
-      }
-    })
-    .then(res => {
-      setCategories(res.data.data)
-    })
   }
 
   const onRefresh = useCallback(() => {
@@ -106,9 +125,21 @@ const DeleteCategory = () => {
             </Picker>
           </View>
           <Gap height={44} />
-          <SubmitButton label="Hapus Kategori" onPress={onSubmit} />
+          <SubmitButton label="Hapus Kategori" onPress={openAlert} />
         </View>
       </View>
+
+      <SCLAlert 
+        theme="warning"
+        show={showAlert}
+        title="Peringatan!!"
+        subtitle="Tekan Tombol Hapus Untuk Menghapus Pelanggan Ini" 
+        onRequestClose={() => {}}
+        useNativeDriver={true}
+      >
+        <SCLAlertButton theme="info" onPress={closeAlert} >Batal</SCLAlertButton>
+        <SCLAlertButton theme="danger" onPress={onSubmit} >Hapus</SCLAlertButton>
+      </SCLAlert>
     </ScrollView>
   )
 }

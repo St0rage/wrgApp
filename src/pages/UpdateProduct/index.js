@@ -101,7 +101,6 @@ const UpdateProduct = ({route, navigation}) => {
       navigation.pop()
     })
     .catch(err => {
-      console.log(err.response)
       const errMsgs = err.response.data.data
       let msg = ''
       let objLength = (Object.keys(errMsgs).length) - 1
@@ -112,7 +111,6 @@ const UpdateProduct = ({route, navigation}) => {
           msg += val
         }
       })
-      console.log(msg)
       dispatch({type: 'SET_LOADING', value: false})
       showMessage(msg, 'danger')
     })

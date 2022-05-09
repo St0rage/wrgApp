@@ -1,10 +1,45 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
-import { currencyFormat } from '../../../utils';
+import { currencyFormat, showMessage } from '../../../utils';
+import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
+import axios from 'axios';
+import {url, token} from '../../../config';
+import { useDispatch } from 'react-redux';
 
-const List = ({name, price = false, id}) => {
+const List = ({name, price = false, id, func = null}) => {
+    const [showAlert, setShowAlert] = useState(false);
+
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+
+    const openAlert = () => {
+        setShowAlert(true)
+    }
+
+    const closeAlert = () => {
+        setShowAlert(false)
+    }
+
+    const deleteCostumer = () => {
+        dispatch({type: 'SET_LOADING', value: true})
+        axios.delete(url + `gas/costumers/${id}`, {
+            headers: {
+                'Authorization': token
+            }
+        })
+        .then(res => {
+            setShowAlert(false)
+            dispatch({type: 'SET_LOADING', value: false})
+            showMessage(res.data.data.message, 'success')
+            func()
+        })
+        .catch(err => {
+            setShowAlert(false)
+            dispatch({type: 'SET_LOADING', value: false})
+            showMessage(err.response.data.data.message, 'danger')
+        })   
+    }
 
     return (
         <View style={styles.container}>
@@ -24,11 +59,23 @@ const List = ({name, price = false, id}) => {
                         <Text style={styles.label(price)}>Ubah Harga</Text>
                     </TouchableOpacity>
                 ) : (
-                    <TouchableOpacity activeOpacity={0.7} style={styles.button(price)} onPress={() => {}} >
+                    <TouchableOpacity activeOpacity={0.7} style={styles.button(price)} onPress={openAlert} >
                         <Text style={styles.label(price)}>Hapus</Text>
                     </TouchableOpacity>
                 )
             }
+
+            <SCLAlert 
+                theme="warning"
+                show={showAlert}
+                title="Peringatan!!"
+                subtitle="Tekan Tombol Hapus Untuk Menghapus Pelanggan Ini" 
+                onRequestClose={() => {}}
+                useNativeDriver={true}
+            >
+                <SCLAlertButton theme="info" onPress={closeAlert} >Batal</SCLAlertButton>
+                <SCLAlertButton theme="danger" onPress={deleteCostumer} >Hapus</SCLAlertButton>
+            </SCLAlert>
         </View>
     )
 }

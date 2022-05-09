@@ -38,8 +38,7 @@ const AddGasNote = () => {
 
                 setGasList(resGasList.data.data);
                 setCostumers(resCostumers.data.data);
-                console.log(resCostumers.data.data);
-
+                
                 dispatch({type: 'SET_LOADING', value: false})
                 })
             )

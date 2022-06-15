@@ -47,6 +47,7 @@ const UpdateGasPrice = ({route, navigation}) => {
         .then(res => {
             const msg = res.data.data.message
             dispatch({type: 'SET_MSG', value: msg})
+            dispatch({type: 'REFRESH_GAS_LIST'})
             navigation.pop()
         })
         .catch(err => {

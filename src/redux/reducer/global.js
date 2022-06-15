@@ -7,6 +7,7 @@ const initGlobalState = {
     gasModalId: '',
     gasModalIdSet: '',
     refreshGasHome: 0,
+    refreshGasList: 0,
     imageUri: '',
     imageModal: false
 }
@@ -58,6 +59,12 @@ export const globalReducer = (state = initGlobalState, action) => {
         return {
             ...state,
             refreshGasHome: state.refreshGasHome + 1
+        }
+    }
+    if (action.type === 'REFRESH_GAS_LIST') {
+        return {
+            ...state,
+            refreshGasList: state.refreshGasList + 1
         }
     }
     if (action.type === 'SET_IMAGE_URI') {

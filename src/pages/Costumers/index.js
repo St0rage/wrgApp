@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { FormHeader, List, Gap } from '../../components'
 import { IcCreate } from '../../assets'
@@ -10,6 +10,7 @@ import { showMessage } from '../../utils'
 
 const Costumers = ({navigation}) => {
   const [costumers, setCostumers] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [refresh, setRefresh] = useState(0)
 
   const dispatch = useDispatch()
@@ -54,6 +55,23 @@ const Costumers = ({navigation}) => {
     }, [])
   )
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    axios.get( url + 'gas/costumers', {
+      headers: {
+        'Authorization': token
+      }
+    })
+    .then(res => {
+      setCostumers(res.data.data)
+      setRefreshing(false)
+    })
+    .catch(err => {
+      setRefreshing(false)
+      showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
+    })
+  }, [])
+
   return (
     <View style={styles.page}>
       <FormHeader title="Daftar Pelanggan" />
@@ -66,7 +84,7 @@ const Costumers = ({navigation}) => {
           </View>
         )
       }
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         {
           costumers.length === 0 ? (
             <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Daftar Pelanggan Masih Kosong</Text>

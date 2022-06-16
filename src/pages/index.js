@@ -12,6 +12,7 @@ import UpdateGasNote from "./UpdateGasNote";
 import UpdateGasPrice from "./UpdateGasPrice";
 import Costumers from "./Costumers";
 import AddCostumers from "./AddCostumers";
+import SplashScreen from "./SplashScreen";
 
 export {
     HomeProduct,

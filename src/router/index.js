@@ -6,6 +6,7 @@ import { Keyboard } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { BottomNavigator, DrawerNavigator } from '../components';
 import { AddCategory, AddCostumers, AddGasNote, AddProduct, Costumers, DeleteCategory, GasList, HomeGas, HomeNota, HomeProduct, ManageProduct, UpdateGasNote, UpdateGasPrice, UpdateProduct } from '../pages';
+import SplashScreen from '../pages/SplashScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -119,6 +120,11 @@ const ManageCostumers = () => {
 const Home = () => {
   return (
     <Stack.Navigator>
+        <Stack.Screen 
+            name="SplashScreen"
+            component={SplashScreen}
+            options={{ headerShown: false }}
+        />
         <Stack.Screen 
             name="MainApp"
             component={MainApp}

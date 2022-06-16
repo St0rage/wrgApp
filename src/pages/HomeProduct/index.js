@@ -16,7 +16,7 @@ const HomeProduct = ({navigation}) => {
   const [activeLabel, setActiveLabel] = useState('Semua');
   const [curCategoryId, setCurCategoryId] = useState('');
   const [search, setSearch] = useState('');
-  
+
   const dispatch = useDispatch();
   const scroll = useRef()
 
@@ -49,8 +49,8 @@ const HomeProduct = ({navigation}) => {
       .catch(errors => {
         dispatch({type: 'SET_LOADING', value: false})
         showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
-      }) 
-      
+      })
+
     }, [])
   )
 
@@ -146,7 +146,7 @@ const HomeProduct = ({navigation}) => {
 
   return (
     <View style={styles.page}>
-      <View style={styles.wrapper}> 
+      <View style={styles.wrapper}>
         <Header onPress={() => navigation.toggleDrawer()} />
         <Gap height={24} />
         <Search placeholder="Cari Barang" value={search} onChangeText={liveSearch} />
@@ -162,14 +162,14 @@ const HomeProduct = ({navigation}) => {
             }
             {
               categories.length == 0 ? (
-                <Text style={{ textAlign: 'center', fontSize: 13}}>Kategori Masih Kosong</Text> 
+                <Text style={{ textAlign: 'center', fontSize: 13}}>Kategori Masih Kosong</Text>
               ) : (
                 categories.map((e, i) => (
                   <CategoryButton label={e.category_name} id={e.id} func={getProductByCategory} key={i} active={activeLabel === e.category_name ? true : false} />
                 ))
               )
             }
-            
+
           </View>
         </ScrollView>
       </View>
@@ -181,7 +181,7 @@ const HomeProduct = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <Gap height={18} />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} >
         <View style={styles.items}>
           {
 
@@ -189,17 +189,16 @@ const HomeProduct = ({navigation}) => {
               <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Produk Masih Kosong</Text>
             ) : (
               products.map((e, i) => (
-                <ProductItem 
-                  title={e.product_name} 
-                  desc={e.price} 
-                  image={e.image} 
-                  categories={e.category} 
+                <ProductItem
+                  title={e.product_name}
+                  desc={e.price}
+                  image={e.image}
+                  categories={e.category}
                   key={i}
                   func={openImage}
                 />
               ))
             )
-            
           }
         </View>
       </ScrollView>

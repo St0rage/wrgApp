@@ -1,6 +1,7 @@
 import CheckBox from '@react-native-community/checkbox'
 import React, { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const CheckBoxInputSet = ({ label, id, func}) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(true)
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },  
   label: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '400',
     color: 'black'
   }

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const HomeNota = () => {
   return (
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: RFValue(25),
     color: '#0A0A0A',
     textAlign: 'center'
   }

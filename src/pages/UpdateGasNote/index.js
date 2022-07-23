@@ -1,15 +1,15 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { FormHeader } from '../../components'
-import { Gap, TextInput, SubmitButton } from '../../components'
 import { Picker } from '@react-native-picker/picker'
-import { IcCounterMinus, IcCounterPlus } from '../../assets'
 import axios from 'axios'
+import qs from 'qs'
+import React, { useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert'
+import { useDispatch } from 'react-redux'
+import { IcCounterMinus, IcCounterPlus } from '../../assets'
+import { FormHeader, Gap, SubmitButton, TextInput } from '../../components'
 import { token, url } from '../../config'
 import { currencyFormat, showMessage } from '../../utils'
-import { useDispatch } from 'react-redux'
-import qs from 'qs'
-import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const UpdateGasNote = ({route, navigation}) => {
@@ -39,7 +39,7 @@ const UpdateGasNote = ({route, navigation}) => {
                 }
             })
             .then(res => {
-                const response = res.data.data[0]
+                const response = res.data.data
                 setData(prev => ({...prev, costumer_name: response.costumer_name}))
                 setData(prev => ({...prev, quantity: parseInt(response.quantity)}))
                 setData(prev => ({...prev, gas_id: response.gas_id}))
@@ -47,6 +47,8 @@ const UpdateGasNote = ({route, navigation}) => {
                 setGasDetail(prev => ({...prev, price: response.price}))
                 dispatch({type: 'SET_LOADING', value: false})
             })
+        } else {
+            return
         }
     }, [id])
 
@@ -63,6 +65,7 @@ const UpdateGasNote = ({route, navigation}) => {
         .then(res => {
             const msg = res.data.data.message
             dispatch({type: 'SET_MSG', value: msg})
+            dispatch({type: 'REFRESH_GAS_HOME'})
             dispatch({type: 'SET_LOADING', value: false})
             navigation.pop()
         })
@@ -126,7 +129,7 @@ const UpdateGasNote = ({route, navigation}) => {
                 show={showAlert}
                 title="Peringatan!!"
                 subtitle="Tekan Tombol Hapus Untuk Menghapus Catatan Ini" 
-                onRequestClose={() => {}}
+                onRequestClose={() => setShowAlert(false)}
                 useNativeDriver={true}
             >
                 <SCLAlertButton theme="info" onPress={() => setShowAlert(false)} >Batal</SCLAlertButton>
@@ -138,8 +141,7 @@ const UpdateGasNote = ({route, navigation}) => {
                 show={showSuccess}
                 title="Sukses"
                 subtitle={deletedMessage} 
-                onRequestClose={() => {}}
-                useNativeDriver={false}
+                onRequestClose={closeSuccessDelete}
             >
                 <SCLAlertButton theme="success" onPress={closeSuccessDelete} >Selesai</SCLAlertButton>
             </SCLAlert>
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16
     },  
     label: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '400',
         color: '#2E2F32',
         marginBottom: 15
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
         borderColor: '#D5D5D5',
     },
     counterNumber: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         color: 'black'
     },

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import MiniCategory from '../../atoms/MiniCategory';
 import { useNavigation } from '@react-navigation/native';
 import { currencyFormat } from '../../../utils';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const ProductItem = ({type = 'default', image, title, desc, categories, func, id, alert}) => {
 
@@ -75,7 +76,7 @@ const ProductItem = ({type = 'default', image, title, desc, categories, func, id
 
 }
 
-export default ProductItem
+export default memo(ProductItem)
 
 const styles = StyleSheet.create({
   container: (type) => ({
@@ -100,12 +101,12 @@ const styles = StyleSheet.create({
     paddingTop: 11
   },
   title: {
-    fontSize: 15,
+    fontSize: RFValue(15),
     fontWeight: '500',
     color: '#232323'
   },
   price: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '500',
     color: '#232323',
     marginTop: 8
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   text: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '500',
     color: 'black'
   },

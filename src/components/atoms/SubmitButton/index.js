@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const SubmitButton = ({label, onPress, type = 'default'}) => {
   return (
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     }),
     label: {
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '500',
         color: 'white'
     }

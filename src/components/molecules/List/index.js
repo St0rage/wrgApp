@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { currencyFormat, showMessage } from '../../../utils';
 import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
 import axios from 'axios';
 import {url, token} from '../../../config';
 import { useDispatch } from 'react-redux';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const List = ({name, price = false, id, func = null}) => {
     const [showAlert, setShowAlert] = useState(false);
@@ -13,13 +14,13 @@ const List = ({name, price = false, id, func = null}) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
 
-    const openAlert = () => {
+    const openAlert = useCallback(() => {
         setShowAlert(true)
-    }
+    }, [])
 
-    const closeAlert = () => {
+    const closeAlert = useCallback(() => {
         setShowAlert(false)
-    }
+    }, [])
 
     const deleteCostumer = () => {
         dispatch({type: 'SET_LOADING', value: true})
@@ -31,8 +32,8 @@ const List = ({name, price = false, id, func = null}) => {
         .then(res => {
             setShowAlert(false)
             dispatch({type: 'SET_LOADING', value: false})
+            dispatch({type: 'REFRESH_COSTUMERS'})
             showMessage(res.data.data.message, 'success')
-            func()
         })
         .catch(err => {
             setShowAlert(false)
@@ -70,8 +71,7 @@ const List = ({name, price = false, id, func = null}) => {
                 show={showAlert}
                 title="Peringatan!!"
                 subtitle="Tekan Tombol Hapus Untuk Menghapus Pelanggan Ini" 
-                onRequestClose={() => {}}
-                useNativeDriver={true}
+                onRequestClose={closeAlert}
             >
                 <SCLAlertButton theme="info" onPress={closeAlert} >Batal</SCLAlertButton>
                 <SCLAlertButton theme="danger" onPress={deleteCostumer} >Hapus</SCLAlertButton>
@@ -93,12 +93,12 @@ const styles = StyleSheet.create({
         borderBottomColor: '#B3B3B3',
     },
     title: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         color: 'black'
     },
     desc: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '500',
         color: '#797979'
     },
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         backgroundColor: price ? '#2DE834' : '#E82D2D'
     }),
     label: (price) => ({
-        fontSize: 13, 
+        fontSize: RFValue(13), 
         fontWeight: '400',
         color:  price ? 'black' : 'white'
     })

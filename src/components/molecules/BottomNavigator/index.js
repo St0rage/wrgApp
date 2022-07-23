@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import React from 'react';
 import { IcBasket, IcBasketWhite, IcFire, IcFireWhite, IcNote, IcNoteWhite } from '../../../assets';
 import { useSelector } from 'react-redux';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const Icon = ({label, focus}) => {
     switch(label) {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     },
     label: (isFocused) => ({
         color: isFocused ? 'white' : '#0A0A0A',
-        fontSize: 12,
+        fontSize: RFValue(12),
         fontWeight: '500',
         marginTop: 5
     })

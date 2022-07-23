@@ -5,6 +5,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { IcArrowDown, IcArrowUp, IcBasketWhite, IcFireWhite, IcTriangle } from '../../../assets';
 import Collapsible from 'react-native-collapsible';
 import { Gap } from '../../atoms';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const DrawerNavigator = ({navigation}) => {
     const [collapseToggle, setCollapseToggle] = useState({
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sectionTitle: {
-        fontSize: 20,
+        fontSize: RFValue(20),
         fontWeight: '500',
         color: 'white',
         marginLeft: 10,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
     collapseLabel: {
         color: 'white',
         marginLeft: 10,
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '400'
     }
 })

@@ -2,12 +2,12 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import qs from 'qs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { StyleSheet, Text, TouchableOpacity, View, FlatList, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CategoryButton, Gap, Header, ProductItem, Search } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const HomeProduct = ({navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -16,12 +16,16 @@ const HomeProduct = ({navigation}) => {
   const [activeLabel, setActiveLabel] = useState('Semua');
   const [curCategoryId, setCurCategoryId] = useState('');
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
 
   const dispatch = useDispatch();
   const scroll = useRef()
+  const flatListRef = useRef();
+  const didMount = useRef(false)
 
   useFocusEffect(
     useCallback(() => {
+      setPage(0)
       setActiveLabel('Semua')
       setCurCategoryId('')
       scroll.current.scrollTo({x: 0 ,y: 0, animated: true})
@@ -55,9 +59,13 @@ const HomeProduct = ({navigation}) => {
   )
 
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
     if (curCategoryId != '') {
       dispatch({type: 'SET_LOADING', value: true})
-      const getProductByCategory = axios.get(url + `products/category/${curCategoryId}`, { headers:{ 'Authorization' : token } })
+      const getProductByCategory = axios.get(url + `products/category/${curCategoryId}`, { headers:{ 'Authorization' : token } },)
       const getTotalProductByCategory = axios.get(url + `products/category/count/${curCategoryId}`, { headers:{ 'Authorization' : token } })
 
       axios
@@ -78,6 +86,7 @@ const HomeProduct = ({navigation}) => {
           showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
         })
     } else {
+      dispatch({type: 'SET_LOADING', value: true})
       const getProducts = axios.get(url + 'products', { headers: { 'Authorization': token } })
       const getTotalProducts = axios.get(url + 'products/count', { headers: { 'Authorization': token } })
 
@@ -101,20 +110,25 @@ const HomeProduct = ({navigation}) => {
     }
   }, [curCategoryId])
 
-  const getProductByCategory = (id, label) => {
+  const getProductByCategory = useCallback((id, label) => {
+    setPage(0)
+    flatListRef.current.scrollToOffset({animated: false, offset: 0})
     setCurCategoryId(id)
     setActiveLabel(label)
     setSearch('')
-  }
+  }, [])
 
-  const openImage = (uri) => {
+  const openImage = useCallback((uri) => {
     dispatch({type: 'SET_IMAGE_URI', value: uri})
     dispatch({type: 'SET_IMAGE_MODAL', value: true})
-  }
+  }, [])
 
   const liveSearch = (value) => {
+    flatListRef.current.scrollToOffset({animated: false, offset: 0})
+    if (value == '') {
+      setPage(0)
+    }
     setSearch(value)
-
     if (curCategoryId === '') {
       axios.post(url + 'products/searchproduct', qs.stringify({'keyword' : value}) , {
         headers: {
@@ -144,6 +158,43 @@ const HomeProduct = ({navigation}) => {
     }
   }
 
+  // onEndReach
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
+    if(curCategoryId == '' && page !== 0) {
+        axios.get(url + 'products', {
+          headers: {'Authorization' : token}, 
+          params: {'page': page}
+        })
+        .then(res => {
+          setProducts((data) => [...data, ...res.data.data])
+        })
+        .catch(err => {
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+    } else if (curCategoryId !== '' && page !== 0) {
+        axios.get(url + `products/category/${curCategoryId}`, {
+          headers: {'Authorization' : token}, 
+          params: {'page': page}
+        })
+        .then(res => {
+          setProducts((data) => [...data, ...res.data.data])
+        })
+        .catch(err => {
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+    }
+  }, [page])
+
+  const loadMore = () => {
+    if ((page * 5) < totalProduct) {
+      setPage(page + 1)
+    }
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.wrapper}>
@@ -162,7 +213,7 @@ const HomeProduct = ({navigation}) => {
             }
             {
               categories.length == 0 ? (
-                <Text style={{ textAlign: 'center', fontSize: 13}}>Kategori Masih Kosong</Text>
+                <Text style={{ textAlign: 'center', fontSize: RFValue(13)}}>Kategori Masih Kosong</Text>
               ) : (
                 categories.map((e, i) => (
                   <CategoryButton label={e.category_name} id={e.id} func={getProductByCategory} key={i} active={activeLabel === e.category_name ? true : false} />
@@ -181,27 +232,28 @@ const HomeProduct = ({navigation}) => {
         </TouchableOpacity>
       </View>
       <Gap height={18} />
-      <ScrollView showsVerticalScrollIndicator={false} >
-        <View style={styles.items}>
-          {
-
-            products.length === 0 ? (
-              <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Produk Masih Kosong</Text>
-            ) : (
-              products.map((e, i) => (
-                <ProductItem
-                  title={e.product_name}
-                  desc={e.price}
-                  image={e.image}
-                  categories={e.category}
-                  key={i}
-                  func={openImage}
-                />
-              ))
-            )
-          }
-        </View>
-      </ScrollView>
+      <FlatList 
+        contentContainerStyle={styles.items}
+        data={products}
+        onEndReached={() => { search == '' ? loadMore() : false }}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        ref={flatListRef}
+        renderItem={({item, index}) => (
+          <ProductItem 
+            title={item.product_name}
+            desc={item.price}
+            image={item.image}
+            categories={item.category}
+            func={openImage}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.items}>
+            <Text style={{ textAlign: 'center', fontSize: RFValue(20), paddingTop: 50 }}>Produk Masih Kosong</Text>
+          </View>
+        )}
+      />
     </View>
   )
 }
@@ -227,7 +279,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   totalLabel: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '500',
     color: 'black'
   },
@@ -239,13 +291,13 @@ const styles = StyleSheet.create({
     fontWeight: '500'
   },
   labelBtn: {
-    fontSize: 10,
+    fontSize: RFValue(10),
     fontWeight: '500',
     color: 'white'
   },
   items: {
     paddingHorizontal: 16,
-    paddingBottom: 16
+    paddingBottom: 20,
   }
 
 })

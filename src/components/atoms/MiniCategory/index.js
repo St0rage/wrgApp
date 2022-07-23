@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const MiniCategory = ({label}) => {
   return (
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
         marginTop: 4
     },
     text: {
-        fontSize: 10,
+        fontSize: RFValue(10),
         fontWeight: '500',
         color: 'white'
     }

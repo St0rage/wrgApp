@@ -1,64 +1,17 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Modal from 'react-native-modalbox'
-import { useDispatch, useSelector } from 'react-redux'
-import { Gap } from '../..'
 import { useNavigation } from '@react-navigation/native'
-import axios from 'axios'
-import { token, url } from '../../../config'
-import { currencyFormat, dateFormat, showMessage } from '../../../utils'
+import React, { useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert'
+import { Gap } from '../..'
+import { currencyFormat, dateFormat } from '../../../utils'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-const GasNoteDetail = () => {
-  const [detail, setDetail] = useState([])
-  const [showAlert, setShowAlert] = useState(false)
+const GasNoteDetail = ({ detail, func }) => {
+    const [showAlert, setShowAlert] = useState(false)
 
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-  const { gasModal, gasModalId } = useSelector((state) => state.globalReducer)
+    const navigation = useNavigation();
 
-  useEffect(() => {
-      if (gasModalId !== '') {
-        axios.get(url + `gas/notedetail/${gasModalId}`, {
-            headers: {
-              'Authorization': token
-            }
-        })
-        .then(res => {
-            setDetail(res.data.data[0])
-        })
-      }
-  }, [gasModalId])
-
-  const update = () => {
-    dispatch({type: 'SET_MODAL', value: false})
-    navigation.navigate('UpdateGasNote', {id: gasModalId})
-  }
-
-  const onClosedModal = () => {
-    dispatch({type: 'SET_MODAL', value: false})
-    dispatch({type: 'SET_MODAL_ID', value: ''})
-  }
-
-  const updateStatus = () => {
-    setShowAlert(false)
-    dispatch({type: 'SET_LOADING', value: true})
-    axios.put(url + `gas/statusnote/${gasModalId}`, {}, {
-        headers: {
-            'Authorization': token
-        }
-    })
-    .then(res => {
-        dispatch({type: 'SET_LOADING', value: false})
-        dispatch({type: 'SET_MODAL', value: false})
-        dispatch({type: 'REFRESH_GAS_HOME'})
-        showMessage(res.data.data.message, 'success')
-    })
-  }
-
-  return (
-    <Modal isOpen={gasModal} onClosed={onClosedModal} style={styles.modal} position={"bottom"} backdropPressToClose={false} backButtonClose={true} >
-        <View style={styles.modalLine} />
+    return (
         <View style={styles.modalContent} >
             <View>
                 <Text style={styles.label}>Penitip</Text>
@@ -101,7 +54,7 @@ const GasNoteDetail = () => {
             <Gap height={30} />
             <View>
                 <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity activeOpacity={0.7} style={styles.button('#2DE834')} onPress={update} >
+                    <TouchableOpacity activeOpacity={0.7} style={styles.button('#2DE834')} onPress={() => navigation.navigate('UpdateGasNote', {id: detail.id})} >
                         <Text style={styles.buttonText('black')}>Ubah</Text>
                     </TouchableOpacity>
                     <Gap width={8} />
@@ -116,15 +69,13 @@ const GasNoteDetail = () => {
                 show={showAlert}
                 title="Peringatan!!"
                 subtitle="Tekan Tombol Selesai Untuk Mengubah Status Catatan Ini" 
-                onRequestClose={() => {}}
-                useNativeDriver={true}
+                onRequestClose={() => setShowAlert(false)}
             >
                 <SCLAlertButton theme="info" onPress={() => setShowAlert(false)} >Batal</SCLAlertButton>
-                <SCLAlertButton theme="success" onPress={updateStatus} >Selesai</SCLAlertButton>
+                <SCLAlertButton theme="success" onPress={() => func(detail.id)} >Selesai</SCLAlertButton>
             </SCLAlert>
         </View>
-    </Modal>
-  )
+    )
 }
 
 export default GasNoteDetail
@@ -150,17 +101,17 @@ const styles = StyleSheet.create({
         // backgroundColor: 'yellow'
     },
     label: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '400',
         color: '#797979',
     },
     costumer: {
-        fontSize: 20,
+        fontSize: RFValue(20),
         fontWeight: '500',
         color: 'black',
     },
     id: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '400',
         color: '#797979',
     },
@@ -170,12 +121,12 @@ const styles = StyleSheet.create({
         borderColor: '#797979'
     }),
     detail: weight => ({
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: weight,
         color: 'black'
     }),
     date: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '400',
         color: '#797979'
     },
@@ -187,7 +138,7 @@ const styles = StyleSheet.create({
         borderRadius: 5
     }),
     buttonText: color => ({
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '500',
         color: color
     })

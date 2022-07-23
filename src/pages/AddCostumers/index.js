@@ -24,6 +24,7 @@ const AddCostumers = () => {
     .then(res => {
       setData({...data, name: ''})
       dispatch({type: 'SET_LOADING', value: false})
+      dispatch({type: 'REFRESH_COSTUMERS'})
       showMessage(res.data.data.message, 'success')
     })
     .catch(err => {

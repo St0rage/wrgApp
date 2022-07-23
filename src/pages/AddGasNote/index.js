@@ -10,6 +10,7 @@ import { token, url } from '../../config'
 import { currencyFormat, showMessage } from '../../utils'
 import { useDispatch } from 'react-redux'
 import qs from 'qs'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const AddGasNote = () => {
     const initialState = {
@@ -59,6 +60,7 @@ const AddGasNote = () => {
         .then(res => {
             setData({...initialState})
             dispatch({type: 'SET_LOADING', value: false})
+            dispatch({type: 'REFRESH_GAS_HOME'})
             showMessage(res.data.data.message, 'success')
         })
         .catch(err => {
@@ -141,7 +143,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16
     },  
     label: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '400',
         color: '#2E2F32',
         marginBottom: 15
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
         borderColor: '#D5D5D5',
     },
     counterNumber: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         color: 'black'
     },

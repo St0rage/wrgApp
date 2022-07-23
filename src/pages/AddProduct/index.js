@@ -1,14 +1,15 @@
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
+import qs from 'qs';
 import React, { useCallback, useState } from 'react';
-import { Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { launchCamera } from 'react-native-image-picker';
 import { useDispatch } from 'react-redux';
 import { CheckBoxInput, FormHeader, Gap, SubmitButton, TextInput } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
-import qs from 'qs';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const AddProduct = () => {
   const initialState = {
@@ -17,7 +18,6 @@ const AddProduct = () => {
     image: ''
   }
   const [resetBox, doResetBox] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
   const [category_id, setCategoryId] = useState([]);
   const [categories, setCategories] = useState([]);
   const [photo, setPhoto] = useState('');
@@ -27,17 +27,21 @@ const AddProduct = () => {
   const oddCategorries = categories.filter((e, i) => i % 2 !== 0);
   const dispatch = useDispatch();
 
-  const getId = (id, action = 'set' ) => {
+  const getId = useCallback((id, action = 'set' ) => {
     if (action === 'set') {
       setCategoryId(arr => [...arr, id]);
     } else {
       setCategoryId(category_id.filter(arr => arr !== id))
     }
-  }
+  }, [category_id])
   
   useFocusEffect(
     useCallback(() => {
       dispatch({type: 'SET_LOADING', value: true})
+      setCategoryId([]);
+      setData({...initialState})
+      setPhoto('')
+      doResetBox(prev => prev + 1);
       axios.get(url + 'categories', {
         headers: {
           'Authorization': token
@@ -53,23 +57,6 @@ const AddProduct = () => {
       })
     }, [])
   )
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    axios.get(url + 'categories', {
-      headers: {
-        'Authorization': token
-      }
-    })
-    .then(res => {
-      setCategories(res.data.data)
-      setRefreshing(false)
-    })
-    .catch(err => {
-      setRefreshing(false)
-      showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
-    })
-  }, [])
 
   const uploadImage = () => {
     launchCamera({includeBase64: true, mediaType: 'photo'}, (response) => {
@@ -131,7 +118,7 @@ const AddProduct = () => {
   }
 
   return (
-    <ScrollView style={{ backgroundColor: 'white' }} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />} >
+    <ScrollView style={{ backgroundColor: 'white' }} showsVerticalScrollIndicator={false} >
       <View style={styles.page}>
         <FormHeader title="Tambah Produk" />
         <Gap height={24} />
@@ -195,7 +182,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20
   },
   label: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     fontWeight: '400',
     color: '#2E2F32',
     marginBottom: 15
@@ -218,7 +205,7 @@ const styles = StyleSheet.create({
     borderWidth: 1
   },
   imageLabel: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '500',
     color: '#424242'
   }

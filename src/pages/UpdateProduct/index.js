@@ -9,6 +9,7 @@ import { CheckBoxInput, CheckBoxInputSet, FormHeader, Gap, SubmitButton, TextInp
 import { token, url } from '../../config'
 import qs from 'qs';
 import { showMessage } from '../../utils'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const UpdateProduct = ({route, navigation}) => {
   const [categories, setCategories] = useState([]);
@@ -41,7 +42,6 @@ const UpdateProduct = ({route, navigation}) => {
 
             const tempCategoryId = resSingleProduct.category.filter(e => e.id).map(obj => obj.id)
             
-
             // categories
             setCategories(resCategories)
             // singleProduct
@@ -57,13 +57,13 @@ const UpdateProduct = ({route, navigation}) => {
     }, [])
   )
 
-  const getId = (id, action = 'set' ) => {
+  const getId = useCallback((id, action = 'set' ) => {
     if (action === 'set') {
       setCategoryId(arr => [...arr, id])
     } else {
       setCategoryId(category_id.filter(arr => arr !== id))
     }
-  }
+  }, [category_id])
 
   const uploadImage = () => {
     launchCamera({includeBase64: true, mediaType: 'photo'}, (response) => {
@@ -77,7 +77,6 @@ const UpdateProduct = ({route, navigation}) => {
       }
     })
   }
-
 
   const submit = () => {
     const newData = {
@@ -115,8 +114,7 @@ const UpdateProduct = ({route, navigation}) => {
       showMessage(msg, 'danger')
     })
   }
-
-
+  
   return (
     <ScrollView style={{ backgroundColor: 'white' }}>
       <View style={styles.page}>
@@ -197,7 +195,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20
   },
   label: {
-    fontSize: 16,
+    fontSize: RFValue(16),
     fontWeight: '400',
     color: '#2E2F32',
     marginBottom: 15

@@ -1,25 +1,22 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, RefreshControl } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import { FormHeader, List, Gap } from '../../components'
-import { IcCreate } from '../../assets'
-import { useDispatch } from 'react-redux'
-import { useFocusEffect } from '@react-navigation/native'
 import axios from 'axios'
+import React, { useEffect, useRef, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View, FlatList } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { IcCreate } from '../../assets'
+import { FormHeader, List } from '../../components'
 import { token, url } from '../../config'
 import { showMessage } from '../../utils'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const Costumers = ({navigation}) => {
   const [costumers, setCostumers] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [refresh, setRefresh] = useState(0)
 
   const dispatch = useDispatch()
-
-  const refreshCostumers = () => {
-    setRefresh(refresh + 1);
-  }
+  const { refreshCostumers } = useSelector((state) => state.globalReducer)
+  const flatListRef = useRef();
 
   useEffect(() => {
+    flatListRef.current.scrollToOffset({animated: false, offset: 0})
     dispatch({type: 'SET_LOADING', value: true})
       axios.get(url + 'gas/costumers', {
         headers: {
@@ -34,67 +31,26 @@ const Costumers = ({navigation}) => {
         dispatch({type: 'SET_LOADING', value: false})
         showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
       })
-  }, [refresh])
-
-  useFocusEffect(
-    useCallback(() => {
-      dispatch({type: 'SET_LOADING', value: true})
-      axios.get(url + 'gas/costumers', {
-        headers: {
-          'Authorization' : token
-        }
-      })
-      .then(res => {
-        setCostumers(res.data.data)
-        dispatch({type: 'SET_LOADING', value: false})
-      })
-      .catch(err => {
-        dispatch({type: 'SET_LOADING', value: false})
-        showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
-      })
-    }, [])
-  )
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    axios.get( url + 'gas/costumers', {
-      headers: {
-        'Authorization': token
-      }
-    })
-    .then(res => {
-      setCostumers(res.data.data)
-      setRefreshing(false)
-    })
-    .catch(err => {
-      setRefreshing(false)
-      showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
-    })
-  }, [])
+  }, [refreshCostumers])
 
   return (
     <View style={styles.page}>
       <FormHeader title="Daftar Pelanggan" />
-      {
-        costumers.length === 0 ? (
-          <></>
-        ) : (
-          <View style={styles.gap} >
-            <Gap height={24} />
-          </View>
-        )
-      }
-      <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        {
-          costumers.length === 0 ? (
-            <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Daftar Pelanggan Masih Kosong</Text>
-          ) : (
-            costumers.map((e, i) => (
-              <List name={e.name} key={i} id={e.id} func={refreshCostumers} />
-            ))
-          )
-        }
-      </ScrollView>
+      <FlatList 
+        data={costumers}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        ref={flatListRef}
+        renderItem={({item, index}) => (
+          <List 
+            name={item.name}
+            id={item.id}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <Text style={{ textAlign: 'center', fontSize: RFValue(20), paddingTop: 50 }}>Daftar Pelanggan Masih Kosong</Text>
+        )}
+      />
       <TouchableOpacity activeOpacity={0.7} style={styles.createButton} onPress={() => navigation.navigate('AddCostumers')}>
         <IcCreate style={{ width: 30, height: 30 }} />
       </TouchableOpacity>

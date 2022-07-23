@@ -1,39 +1,11 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Modal from 'react-native-modalbox'
-import { useDispatch, useSelector } from 'react-redux'
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import { Gap } from '../..'
-import axios from 'axios'
-import { token, url } from '../../../config'
 import { currencyFormat, dateFormat } from '../../../utils'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-const GasNoteDetailSet = () => {
-  const [detail, setDetail] = useState([]);
-
-  const dispatch = useDispatch();
-  const { gasModalSet, gasModalIdSet } = useSelector((state) => state.globalReducer)
-
-  useEffect(() => {
-      if (gasModalIdSet !== '') {
-        axios.get(url + `gas/notedetail/${gasModalIdSet}`, {
-            headers: {
-                'Authorization': token
-            }
-        })
-        .then(res => {
-            setDetail(res.data.data[0])
-        })
-      }
-  }, [gasModalIdSet])
-
-  const onClosedModal = () => {
-    dispatch({type: 'SET_MODAL1', value: false})
-    dispatch({type: 'SET_MODAL_ID1', value: ''})
-  }
-
-  return (
-    <Modal isOpen={gasModalSet} onClosed={onClosedModal} style={styles.modal} position={"bottom"} backdropPressToClose={false} backButtonClose={true} >
-        <View style={styles.modalLine} />
+const GasNoteDetailSet = ({detail}) => {
+    return (
         <View style={styles.modalContent} >
             <View>
                 <Text style={styles.label}>Penitip</Text>
@@ -78,8 +50,7 @@ const GasNoteDetailSet = () => {
                 </View>
             </View>
         </View>
-    </Modal>
-  )
+    )
 }
 
 export default GasNoteDetailSet
@@ -105,17 +76,17 @@ const styles = StyleSheet.create({
         // backgroundColor: 'yellow'
     },
     label: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '400',
         color: '#797979',
     },
     costumer: {
-        fontSize: 20,
+        fontSize: RFValue(20),
         fontWeight: '500',
         color: 'black',
     },
     id: {
-        fontSize: 13,
+        fontSize: RFValue(13),
         fontWeight: '400',
         color: '#797979',
     },
@@ -125,12 +96,12 @@ const styles = StyleSheet.create({
         borderColor: '#797979'
     }),
     detail: weight => ({
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: weight,
         color: 'black'
     }),
     date: {
-        fontSize: 14,
+        fontSize: RFValue(14),
         fontWeight: '400',
         color: '#797979'
     },
@@ -142,7 +113,7 @@ const styles = StyleSheet.create({
         borderRadius: 5
     }),
     buttonText: color => ({
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         color: color
     })

@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { IcBurgerMenu } from '../../../assets'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const Header = ({onPress}) => {
   return (
@@ -24,7 +25,7 @@ const styles = StyleSheet.create({
     },
     icon: { width: 32, height: 32, padding: 5 },
     title: {
-        fontSize: 16,
+        fontSize: RFValue(16),
         fontWeight: '500',
         color: 'black',
         marginLeft: 26

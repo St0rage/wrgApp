@@ -2,13 +2,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import qs from 'qs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View, FlatList, ScrollView } from 'react-native';
 import { SCLAlert, SCLAlertButton } from 'react-native-scl-alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { CategoryButton, Gap, Header, ProductItem, Search } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 const ManageProduct = ({navigation}) => {
@@ -22,11 +22,19 @@ const ManageProduct = ({navigation}) => {
   const [activeLabel, setActiveLabel] = useState('Semua');
   const [curCategoryId, setCurCategoryId] = useState('');
   const [search, setSearch] = useState('');
-
+  const [page, setPage] = useState(0);
 
   const msg = useSelector((state) => state.globalReducer)
+  const didMount = useRef(false)
+  const flatListRef = useRef();
+  const dispatch = useDispatch();
+  const scroll = useRef(); 
   
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
     if (msg?.updateMsg) {
       showMessage(msg?.updateMsg, 'success');
       dispatch({type: 'SET_MSG', value: false})
@@ -34,6 +42,10 @@ const ManageProduct = ({navigation}) => {
   }, [msg?.updateMsg])
 
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
     if (!showSuccess) {
       setActiveLabel('Semua')
       setCurCategoryId('')
@@ -61,11 +73,9 @@ const ManageProduct = ({navigation}) => {
     }
   }, [showSuccess])
 
-  const dispatch = useDispatch();
-  const scroll = useRef(); 
-
   useFocusEffect(
     useCallback(() => {
+      setPage(0)
       setActiveLabel('Semua')
       setCurCategoryId('')
       scroll.current.scrollTo({x: 0 ,y: 0, animated: true})
@@ -98,6 +108,10 @@ const ManageProduct = ({navigation}) => {
   )
 
   useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
     if (curCategoryId != '') {
       dispatch({type: 'SET_LOADING', value: true})
       const getProductByCategory = axios.get(url + `products/category/${curCategoryId}`, { headers:{ 'Authorization' : token } })
@@ -121,6 +135,7 @@ const ManageProduct = ({navigation}) => {
           showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
         })
     } else {
+      dispatch({type: 'SET_LOADING', value: true})
       const getProducts = axios.get(url + 'products', { headers: { 'Authorization': token } })
       const getTotalProducts = axios.get(url + 'products/count', { headers: { 'Authorization': token } })
 
@@ -144,25 +159,25 @@ const ManageProduct = ({navigation}) => {
     }
   }, [curCategoryId])
 
-  const openImage = (uri) => {
+  const openImage = useCallback((uri) => {
     dispatch({type: 'SET_IMAGE_URI', value: uri})
     dispatch({type: 'SET_IMAGE_MODAL', value: true})
-  }
+  }, [])
 
-  const openAlert = (id) => {
+  const openAlert = useCallback((id) => {
     setCurrentId(id)
     setShowAlert(true)
-  }
+  }, [])
 
-  const closeAlert = () => {
+  const closeAlert = useCallback(() => {
     setCurrentId('')
     setShowAlert(false)
-  }
+  }, [])
   
-  const closeSuccess = () => {
+  const closeSuccess = useCallback(() => {
     setCurrentId('')
     setShowSuccess(false)
-  }
+  }, [])
 
   const deleteProduct = () => {
     setShowAlert(false)
@@ -182,15 +197,20 @@ const ManageProduct = ({navigation}) => {
     })
   }
 
-  const getProductByCategory = (id, label) => {
+  const getProductByCategory = useCallback((id, label) => {
+    setPage(0)
+    flatListRef.current.scrollToOffset({animated: false, offset: 0})
     setCurCategoryId(id)
     setActiveLabel(label)
     setSearch('')
-  }
+  }, [])
 
   const liveSearch = (value) => {
+    flatListRef.current.scrollToOffset({animated: false, offset: 0})
+    if (value == '') {
+      setPage(0)
+    }
     setSearch(value)
-
     if (curCategoryId === '') {
       axios.post(url + 'products/searchproduct', qs.stringify({'keyword' : value}) , {
         headers: {
@@ -220,6 +240,44 @@ const ManageProduct = ({navigation}) => {
     }
   }
 
+  // onEndReach
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
+
+    if(curCategoryId == '' && page !== 0) {
+        axios.get(url + 'products', {
+          headers: {'Authorization' : token}, 
+          params: {'page': page}
+        })
+        .then(res => {
+          setProducts((data) => [...data, ...res.data.data])
+        })
+        .catch(err => {
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+    } else if (curCategoryId !== '' && page !== 0) {
+        axios.get(url + `products/category/${curCategoryId}`, {
+          headers: {'Authorization' : token}, 
+          params: {'page': page}
+        })
+        .then(res => {
+          setProducts((data) => [...data, ...res.data.data])
+        })
+        .catch(err => {
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+    }
+  }, [page])
+
+  const loadMore = () => {
+    if ((page * 5) < totalProduct) {
+      setPage(page + 1)
+    }
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.wrapper}> 
@@ -238,7 +296,7 @@ const ManageProduct = ({navigation}) => {
             }
             {
               categories.length == 0 ? (
-                <Text style={{ textAlign: 'center', fontSize: 13}}>Kategori Masih Kosong</Text> 
+                <Text style={{ textAlign: 'center', fontSize: RFValue(13)}}>Kategori Masih Kosong</Text> 
               ) : (
                 categories.map((e, i) => (
                   <CategoryButton label={e.category_name} id={e.id} func={getProductByCategory} key={i} active={activeLabel === e.category_name ? true : false} />
@@ -253,30 +311,31 @@ const ManageProduct = ({navigation}) => {
         <Text style={styles.totalLabel} >Total Produk : {totalProduct}</Text>
       </View>
       <Gap height={18} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.items}>
-          {
-            products.length === 0 ? (
-              <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Produk Masih Kosong</Text>
-            ) : (
-              products.map((e, i) => (
-                <ProductItem 
-                  type='manage'
-                  title={e.product_name} 
-                  desc={e.price} 
-                  image={e.image} 
-                  categories={e.category}
-                  id={e.id}
-                  key={i}
-                  func={openImage}
-                  alert={openAlert}
-                />
-              ))
-            )
-            
-          }
-        </View>
-      </ScrollView>
+      <FlatList 
+        contentContainerStyle={styles.items}
+        data={products}
+        onEndReached={() => { search == '' ? loadMore() : false }}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        ref={flatListRef}
+        renderItem={({item, index}) => (
+          <ProductItem 
+            type='manage'
+            title={item.product_name}
+            desc={item.price}
+            image={item.image}
+            categories={item.category}
+            id={item.id}
+            func={openImage}
+            alert={openAlert}
+          />
+        )}
+        ListEmptyComponent={() => (
+          <View style={styles.items}>
+            <Text style={{ textAlign: 'center', fontSize: RFValue(20), paddingTop: 50 }}>Produk Masih Kosong</Text>
+          </View>
+        )}
+      />
 
       <SCLAlert 
         theme="warning"
@@ -326,7 +385,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   totalLabel: {
-    fontSize: 12,
+    fontSize: RFValue(12),
     fontWeight: '500',
     color: 'black'
   },
@@ -337,7 +396,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2D52E8'
   },
   labelBtn: {
-    fontSize: 10,
+    fontSize: RFValue(10),
     fontWeight: '500',
     color: 'white'
   },

@@ -23,8 +23,6 @@ const MainApp = () => {
           <Router />
           <FlashMessage position="top" />
           {isLoading && <Loading />}
-          <GasNoteDetail />
-          <GasNoteDetailSet />
           <ProductImage />
       </NavigationContainer>
     </GestureHandlerRootView>

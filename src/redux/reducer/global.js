@@ -2,11 +2,8 @@ const initGlobalState = {
     isLoading: false,
     keyboard: false,
     updateMsg: '',
-    gasModal: false,
-    gasModalSet: false,
-    gasModalId: '',
-    gasModalIdSet: '',
     refreshGasHome: 0,
+    refreshCostumers: 0,
     refreshGasList: 0,
     imageUri: '',
     imageModal: false
@@ -31,34 +28,16 @@ export const globalReducer = (state = initGlobalState, action) => {
             updateMsg: action.value
         }
     }
-    if (action.type === 'SET_MODAL') {
-        return {
-            ...state,
-            gasModal: action.value
-        }
-    }
-    if (action.type === 'SET_MODAL1') {
-        return {
-            ...state,
-            gasModalSet: action.value
-        }
-    }
-    if (action.type === 'SET_MODAL_ID') {
-        return {
-            ...state,
-            gasModalId: action.value
-        }
-    }
-    if (action.type === 'SET_MODAL_ID1') {
-        return {
-            ...state,
-            gasModalIdSet: action.value
-        }
-    }
     if (action.type === 'REFRESH_GAS_HOME') {
         return {
             ...state,
             refreshGasHome: state.refreshGasHome + 1
+        }
+    }
+    if (action.type === 'REFRESH_COSTUMERS') {
+        return {
+            ...state,
+            refreshCostumers: state.refreshCostumers + 1
         }
     }
     if (action.type === 'REFRESH_GAS_LIST') {

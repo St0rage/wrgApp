@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const CategoryButton = ({label, id, func, active}) => {
   
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
         marginRight: 5,
     }),
     label: {
-        fontSize: 15,
+        fontSize: RFValue(15),
         fontWeight: '500',
         color: 'white',
         textAlign: 'center'

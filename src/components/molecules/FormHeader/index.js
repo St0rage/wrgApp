@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const FormHeader = ({title}) => {
   return (
@@ -19,7 +20,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#D5D5D5'
     },
     title: {
-        fontSize: 20,
+        fontSize: RFValue(20),
         fontWeight: '500',
         color: '#232323'
     }

@@ -1,43 +1,30 @@
 import axios from 'axios';
-import React, { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, Text, View, ScrollView, RefreshControl } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { FormHeader, Gap, List } from '../../components';
+import { FormHeader, List } from '../../components';
 import { token, url } from '../../config';
 import { showMessage } from '../../utils';
+import { RFValue } from 'react-native-responsive-fontsize'
 
 const GasList = () => {
     const [gas, setGas] = useState([]);
-    const [refreshing, setRefreshing] = useState(false);
     
-
     const dispatch = useDispatch()
     const msg = useSelector((state) => state.globalReducer)
     const { refreshGasList } = useSelector((state) => state.globalReducer)
+    const didMount = useRef(false)
 
     useEffect(() => {
+        if (!didMount.current) {
+            didMount.current = true;
+            return; 
+        }
         if (msg?.updateMsg) {
           showMessage(msg?.updateMsg, 'success');
           dispatch({type: 'SET_MSG', value: false})
         }
     }, [msg?.updateMsg])
-
-    useEffect(() => {
-        dispatch({type: 'SET_LOADING', value: true})
-          axios.get(url + 'gas', {
-            headers: {
-              'Authorization': token
-            }
-          })
-          .then(res => {
-            setGas(res.data.data);
-            dispatch({type: 'SET_LOADING', value: false})
-          })
-          .catch(err => {
-            dispatch({type: 'SET_LOADING', value: false})
-            showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
-          })
-      }, [refreshGasList])
 
     useEffect(() => {
         dispatch({type: 'SET_LOADING', value: true})
@@ -54,49 +41,27 @@ const GasList = () => {
                 dispatch({type: 'SET_LOADING', value: false})
                 showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
             })
-    }, [])
-
-    const onRefresh = useCallback(() => {
-        setRefreshing(true);
-        axios.get( url + 'gas', {
-          headers: {
-            'Authorization': token
-          }
-        })
-        .then(res => {
-          setGas(res.data.data)
-          setRefreshing(false)
-        })
-        .catch(err => {
-          setRefreshing(false)
-          showMessage('Gagal terhubung ke server, hubungi admin', 'danger');
-        })
-    }, [])
+    }, [refreshGasList])
 
     return (
-        <ScrollView style={{ backgroundColor: 'white' }} showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-            <View style={styles.page}>
-                <FormHeader title="Daftar Gas" />
-                {
-                    gas.length === 0 ? (
-                        <></>
-                    ) : (
-                        <View style={styles.gap} >
-                            <Gap height={24} />
-                        </View>
-                    )
-                }
-                {
-                    gas.length === 0 ? (                    
-                        <Text style={{ textAlign: 'center', fontSize: 20, paddingTop: 50 }}>Daftar Gas Kosong</Text>
-                    ) : (
-                        gas.map((e, i) => (
-                            <List name={e.name} price={e.price} key={i} id={e.id} />
-                        ))
-                    )
-                }
-            </View>
-        </ScrollView>
+        <View style={styles.page}>
+            <FormHeader title="Daftar Gas" />
+            <FlatList 
+                data={gas}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                renderItem={({item, index}) => (
+                    <List 
+                        name={item.name}
+                        price={item.price}
+                        id={item.id}
+                    />
+                )}
+                ListEmptyComponent={() => (
+                    <Text style={{ textAlign: 'center', fontSize: RFValue(20), paddingTop: 50 }}>Daftar Gas Kosong</Text>
+                )}
+            />
+        </View>
     )
 }
 

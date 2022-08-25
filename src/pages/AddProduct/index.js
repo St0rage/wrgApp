@@ -59,7 +59,7 @@ const AddProduct = () => {
   )
 
   const uploadImage = () => {
-    launchCamera({includeBase64: true, mediaType: 'photo'}, (response) => {
+    launchCamera({quality: 0.3, maxHeight: 250, includeBase64: true, mediaType: 'photo'}, (response) => {
       if (response.didCancel || response.errorCode) {
         showMessage('Foto tidak dipilih', 'warning')
       } else {

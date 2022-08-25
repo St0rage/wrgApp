@@ -28,7 +28,6 @@ const AddCategory = () => {
       })
       .catch(err => {
         const error = err.response
-        console.log(error)
         dispatch({type: 'SET_LOADING', value: false})
         error === undefined 
         ? showMessage('Gagal terhubung ke server, hubungi admin', 'danger') 

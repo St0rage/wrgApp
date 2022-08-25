@@ -129,34 +129,71 @@ const HomeProduct = ({navigation}) => {
       setPage(0)
     }
     setSearch(value)
-    if (curCategoryId === '') {
-      axios.post(url + 'products/searchproduct', qs.stringify({'keyword' : value}) , {
-        headers: {
-          'Authorization': token
-        }
-      })
-      .then(res => {
-        setProducts(res.data.data)
-      })
-      .catch(err => {
-        dispatch({type: 'SET_LOADING', value: false})
-        showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
-      })
-    } else {
-      axios.post(url + 'products/category/searchproduct', qs.stringify({'keyword' : value, 'id-category' : curCategoryId}) , {
-        headers: {
-          'Authorization': token
-        }
-      })
-      .then(res => {
-        setProducts(res.data.data)
-      })
-      .catch(err => {
-        dispatch({type: 'SET_LOADING', value: false})
-        showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
-      })
-    }
+    // if (curCategoryId === '') {
+    //   axios.post(url + 'products/searchproduct', qs.stringify({'keyword' : value}) , {
+    //     headers: {
+    //       'Authorization': token
+    //     }
+    //   })
+    //   .then(res => {
+    //     setProducts(res.data.data)
+    //   })
+    //   .catch(err => {
+    //     dispatch({type: 'SET_LOADING', value: false})
+    //     showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+    //   })
+    // } else {
+    //   axios.post(url + 'products/category/searchproduct', qs.stringify({'keyword' : value, 'id-category' : curCategoryId}) , {
+    //     headers: {
+    //       'Authorization': token
+    //     }
+    //   })
+    //   .then(res => {
+    //     setProducts(res.data.data)
+    //   })
+    //   .catch(err => {
+    //     dispatch({type: 'SET_LOADING', value: false})
+    //     showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+    //   })
+    // }
   }
+
+  // search
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return; 
+    }
+    setTimeout(() => {
+      if (curCategoryId === '') {
+        axios.post(url + 'products/searchproduct', qs.stringify({'keyword' : search}) , {
+          headers: {
+            'Authorization': token
+          }
+        })
+        .then(res => {
+          setProducts(res.data.data)
+        })
+        .catch(err => {
+          dispatch({type: 'SET_LOADING', value: false})
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+      } else {
+        axios.post(url + 'products/category/searchproduct', qs.stringify({'keyword' : search, 'id-category' : curCategoryId}) , {
+          headers: {
+            'Authorization': token
+          }
+        })
+        .then(res => {
+          setProducts(res.data.data)
+        })
+        .catch(err => {
+          dispatch({type: 'SET_LOADING', value: false})
+          showMessage('Gagal terhubung ke server, hubungi admin', 'danger')
+        })
+      }
+    }, 1000)
+  }, [search])
 
   // onEndReach
   useEffect(() => {
